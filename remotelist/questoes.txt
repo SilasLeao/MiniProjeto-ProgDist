@@ -2,7 +2,7 @@ Respostas referentes à Questão 2 do documento
 
 1. Características e limitações em termos de escalabilidade, disponibilidade e consistência
 
-    O sistema implementado apresenta consistência forte, porque existe apenas uma instância do servidor RemoteList e todas as operações passam por um único ponto sincronizado por mutex. Isso significa que as atualizações nas listas são aplicadas imediatamente e sempre em uma ordem bem definida, garantindo que todos os clientes vejam o mesmo estado da lista. A combinação de memória + log + snapshot também garante que após um reinício, o servidor reconstrua o estado mais recente. Por outro lado, essa arquitetura tem baixa escalabilidade. Como existe apenas um servidor central, todas as requisições são processadas em uma única máquina. O uso de mutex global, necessário para garantir a consistência, faz com que operações simultâneas sejam "ordenadas", criando bloqueios quando vários clientes tentam acessar múltiplas listas ao mesmo tempo. Isso sustenta a consistência, porém reduz o desempenho à medida que o número de clientes cresce. Quanto à disponibilidade, ela também é limitada. O servidor é um ponto único de falha: se o processo parar ou o computador desligar, todo o serviço fica indisponível até que o servidor seja reiniciado. O sistema fornece persistência (via log e snapshot), mas não oferece redundância. Assim, ele garante integridade do estado após falhas, mas não mantém o serviço online durante a falha.
+    O sistema implementado apresenta consistência forte, porque existe apenas uma instância do servidor RemoteList e todas as operações passam por um único ponto sincronizado por mutex. Isso significa que as atualizações nas listas são aplicadas imediatamente e sempre em uma ordem bem definida, garantindo que todos os clientes vejam o mesmo estado da lista. A combinação de memória + log + snapshot também garante que após um reinício, o servidor reconstrua o estado mais recente. Por outro lado, essa arquitetura tem baixa escalabilidade. Como existe apenas um servidor central, todas as requisições são processadas em uma única máquina. O uso de mutex global, necessário para garantir a consistência, faz com que operações simultâneas sejam "ordenadas", criando bloqueios quando vários clientes tentam acessar múltiplas listas ao mesmo tempo. Isso sustenta a consistência, porém reduz o desempenho à medida que o número de clientes cresce. Quanto à disponibilidade, ela também é limitada. O servidor é um ponto único de falha: se o processo parar ou o computador desligar, todo o serviço fica indisponível até que o servidor seja reiniciado.
 
 2. Pontos possíveis de falha
 
@@ -17,7 +17,6 @@ Respostas referentes à Questão 2 do documento
     Porém, o sistema atual não lida com:
     - indisponibilidade durante falhas
     - rollback de operações incompletas
-    - indisponibilidade durante falhas
 
 4. Como a escalabilidade poderia ser melhorada
 
@@ -25,5 +24,6 @@ Respostas referentes à Questão 2 do documento
     - Cluster (Distribuir listas por diferentes servidores, paralelizando o trabalho e eliminando o gargalo de um único servidor)
 
 5. A solução de escalabilidade afetaria consistência e disponibilidade?
+
 
     Sim. Melhorar a escalabilidade levanta um trade-off em relação à consistência e disponibilidade. Para aceitar mais clientes ao mesmo tempo, pode ser necessário abrir mão da consistência; ou no caminho inverso, para manter os dados sempre consistentes, o sistema pode ficar menos disponível quando ocorrer alguma falha, devido a maior necessidade de garantir dados atualizados.
